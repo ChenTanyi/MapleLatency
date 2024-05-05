@@ -3,7 +3,9 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     </head>
     <body>
-        <img id="latency" style="width: 0;height: 0;" />
+        <button onclick="check('http')"> Check HTTP </button>
+        <button onclick="check('https')"> Check HTTPS </button>
+        <div id="latency"></div>
         <div id="display"></div>
     </body>
 
@@ -51,16 +53,22 @@
             { "channel": 40, "ip": "44.234.162.130" },
         ]
 
-        for (const ch of channels) {
-            const number = ch['channel'];
-            const ip = ch['ip'];
-            const url = `http://${ip}:8585/`;
-            const start = Date.now();
-            $("#latency").attr("src", url).on("error", function() {
-                const end = Date.now();
-                const latency = end - start;
-                $("#display").append(`<p> <span style="font-weight:bold"> Ch ${number} -- ${ip}: </span><span style="background-color:${addColor(latency)}; padding: 3px;"> ${latency}ms </span></p>`)
-            })
+
+        function check(scheme) {
+            $("#latency").html('');
+            $("#display").html('');
+            for (const ch of channels) {
+                const number = ch['channel'];
+                const ip = ch['ip'];
+                const url = `${scheme}://${ip}:8585/`;
+                $("#latency").append(`<img id="${number}" style="width: 0;height: 0;" />`)
+                const start = Date.now();
+                $(`#${number}`).attr("src", url).on("error", function() {
+                    const end = Date.now();
+                    const latency = end - start;
+                    $("#display").append(`<p> <span style="font-weight:bold"> Ch ${number} -- ${ip}: </span><span style="background-color:${addColor(latency)}; padding: 3px;"> ${latency}ms </span></p>`)
+                })
+            }
         }
 
         function addColor(latency) {
